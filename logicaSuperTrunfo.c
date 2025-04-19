@@ -2,7 +2,7 @@
  * Super Trunfo - Comparador de Cidades
  * 
  * Programa que compara duas cidades brasileiras baseado em seus atributos.
- * Nivel: Aventureiro - Comparacao com menu interativo.
+ * Nivel: Mestre - Comparacao com dois atributos e soma de valores.
  */
 
 #include <stdio.h>
@@ -18,7 +18,7 @@
 #define OPCAO_PIB 3
 #define OPCAO_PONTOS_TURISTICOS 4
 #define OPCAO_DENSIDADE 5
-#define OPCAO_SAIR 6
+#define TOTAL_ATRIBUTOS 5
 
 // Estrutura que representa uma cidade no jogo
 typedef struct {
@@ -33,19 +33,29 @@ typedef struct {
     float pibPerCapita;              // Calculado: pib / populacao
 } Cidade;
 
-// Funcao para exibir o menu de opcoes
-int exibirMenu() {
+// Funcao para exibir o menu de opcoes, excluindo atributo ja escolhido
+int exibirMenu(int atributoJaEscolhido) {
     int opcao;
     
     printf("\n=== Menu de Comparacao ===\n");
-    printf("1. Populacao\n");
-    printf("2. Area\n");
-    printf("3. PIB\n");
-    printf("4. Pontos Turisticos\n");
-    printf("5. Densidade Populacional\n");
-    printf("6. Sair\n");
+    if (atributoJaEscolhido != OPCAO_POPULACAO)
+        printf("1. Populacao\n");
+    if (atributoJaEscolhido != OPCAO_AREA)
+        printf("2. Area\n");
+    if (atributoJaEscolhido != OPCAO_PIB)
+        printf("3. PIB\n");
+    if (atributoJaEscolhido != OPCAO_PONTOS_TURISTICOS)
+        printf("4. Pontos Turisticos\n");
+    if (atributoJaEscolhido != OPCAO_DENSIDADE)
+        printf("5. Densidade Populacional\n");
+    
     printf("\nEscolha o atributo para comparacao: ");
-    scanf("%d", &opcao);
+    do {
+        scanf("%d", &opcao);
+        if (opcao == atributoJaEscolhido || opcao < 1 || opcao > TOTAL_ATRIBUTOS) {
+            printf("Opcao invalida! Escolha outro atributo: ");
+        }
+    } while (opcao == atributoJaEscolhido || opcao < 1 || opcao > TOTAL_ATRIBUTOS);
     
     return opcao;
 }
@@ -94,104 +104,90 @@ void exibirCidade(Cidade cidade) {
     printf("PIB per capita: R$ %.2f\n", cidade.pibPerCapita);
 }
 
-// Funcao que compara as cidades pelo atributo escolhido
-void compararCidades(Cidade cidade1, Cidade cidade2, int atributo) {
-    printf("\nComparacao de cartas\n");
-    
-    // Define qual atributo sera comparado
+// Funcao que retorna o valor normalizado do atributo escolhido
+float obterValorAtributo(Cidade cidade, int atributo) {
     switch(atributo) {
         case OPCAO_POPULACAO:
-            printf("\nAtributo: Populacao\n");
-            printf("Carta 1 - %s (%s): %d habitantes\n", 
-                   cidade1.nome, cidade1.estado, cidade1.populacao);
-            printf("Carta 2 - %s (%s): %d habitantes\n", 
-                   cidade2.nome, cidade2.estado, cidade2.populacao);
-            
-            printf("\nResultado: ");
-            if (cidade1.populacao > cidade2.populacao) {
-                printf("Carta 1 (%s) venceu!\n", cidade1.nome);
-            } else if (cidade2.populacao > cidade1.populacao) {
-                printf("Carta 2 (%s) venceu!\n", cidade2.nome);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
-            
+            return (float)cidade.populacao;
         case OPCAO_AREA:
-            printf("\nAtributo: Area\n");
-            printf("Carta 1 - %s (%s): %.2f km2\n", 
-                   cidade1.nome, cidade1.estado, cidade1.area);
-            printf("Carta 2 - %s (%s): %.2f km2\n", 
-                   cidade2.nome, cidade2.estado, cidade2.area);
-            
-            printf("\nResultado: ");
-            if (cidade1.area > cidade2.area) {
-                printf("Carta 1 (%s) venceu!\n", cidade1.nome);
-            } else if (cidade2.area > cidade1.area) {
-                printf("Carta 2 (%s) venceu!\n", cidade2.nome);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
-            
+            return cidade.area;
         case OPCAO_PIB:
-            printf("\nAtributo: PIB\n");
-            printf("Carta 1 - %s (%s): %.2f milhoes\n", 
-                   cidade1.nome, cidade1.estado, cidade1.pib);
-            printf("Carta 2 - %s (%s): %.2f milhoes\n", 
-                   cidade2.nome, cidade2.estado, cidade2.pib);
-            
-            printf("\nResultado: ");
-            if (cidade1.pib > cidade2.pib) {
-                printf("Carta 1 (%s) venceu!\n", cidade1.nome);
-            } else if (cidade2.pib > cidade1.pib) {
-                printf("Carta 2 (%s) venceu!\n", cidade2.nome);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
-            
+            return cidade.pib;
         case OPCAO_PONTOS_TURISTICOS:
-            printf("\nAtributo: Pontos Turisticos\n");
-            printf("Carta 1 - %s (%s): %d pontos\n", 
-                   cidade1.nome, cidade1.estado, cidade1.pontosTuristicos);
-            printf("Carta 2 - %s (%s): %d pontos\n", 
-                   cidade2.nome, cidade2.estado, cidade2.pontosTuristicos);
-            
-            printf("\nResultado: ");
-            if (cidade1.pontosTuristicos > cidade2.pontosTuristicos) {
-                printf("Carta 1 (%s) venceu!\n", cidade1.nome);
-            } else if (cidade2.pontosTuristicos > cidade1.pontosTuristicos) {
-                printf("Carta 2 (%s) venceu!\n", cidade2.nome);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
-            
+            return (float)cidade.pontosTuristicos;
         case OPCAO_DENSIDADE:
-            printf("\nAtributo: Densidade Populacional\n");
-            printf("Carta 1 - %s (%s): %.2f hab/km2\n", 
-                   cidade1.nome, cidade1.estado, cidade1.densidadePopulacional);
-            printf("Carta 2 - %s (%s): %.2f hab/km2\n", 
-                   cidade2.nome, cidade2.estado, cidade2.densidadePopulacional);
-            
-            printf("\nResultado: ");
-            // Para densidade, menor valor vence
-            if (cidade1.densidadePopulacional < cidade2.densidadePopulacional) {
-                printf("Carta 1 (%s) venceu!\n", cidade1.nome);
-            } else if (cidade2.densidadePopulacional < cidade1.densidadePopulacional) {
-                printf("Carta 2 (%s) venceu!\n", cidade2.nome);
-            } else {
-                printf("Empate!\n");
-            }
-            break;
+            return cidade.densidadePopulacional;
+        default:
+            return 0;
+    }
+}
+
+// Funcao que retorna o nome do atributo
+const char* obterNomeAtributo(int atributo) {
+    switch(atributo) {
+        case OPCAO_POPULACAO:
+            return "Populacao";
+        case OPCAO_AREA:
+            return "Area";
+        case OPCAO_PIB:
+            return "PIB";
+        case OPCAO_PONTOS_TURISTICOS:
+            return "Pontos Turisticos";
+        case OPCAO_DENSIDADE:
+            return "Densidade Populacional";
+        default:
+            return "Desconhecido";
+    }
+}
+
+// Funcao que compara as cidades usando dois atributos
+void compararCidades(Cidade cidade1, Cidade cidade2, int atributo1, int atributo2) {
+    float valor1_atr1 = obterValorAtributo(cidade1, atributo1);
+    float valor2_atr1 = obterValorAtributo(cidade2, atributo1);
+    float valor1_atr2 = obterValorAtributo(cidade1, atributo2);
+    float valor2_atr2 = obterValorAtributo(cidade2, atributo2);
+    
+    // Normaliza os valores para densidade populacional (menor é melhor)
+    if (atributo1 == OPCAO_DENSIDADE) {
+        valor1_atr1 = 1.0f / valor1_atr1;
+        valor2_atr1 = 1.0f / valor2_atr1;
+    }
+    if (atributo2 == OPCAO_DENSIDADE) {
+        valor1_atr2 = 1.0f / valor1_atr2;
+        valor2_atr2 = 1.0f / valor2_atr2;
+    }
+    
+    // Calcula a soma dos valores normalizados
+    float soma1 = valor1_atr1 + valor1_atr2;
+    float soma2 = valor2_atr1 + valor2_atr2;
+    
+    // Exibe os valores de comparacao
+    printf("\n=== Comparacao de Atributos ===\n");
+    printf("\nCarta 1 - %s (%s):\n", cidade1.nome, cidade1.estado);
+    printf("%s: %.2f\n", obterNomeAtributo(atributo1), valor1_atr1);
+    printf("%s: %.2f\n", obterNomeAtributo(atributo2), valor1_atr2);
+    printf("Soma: %.2f\n", soma1);
+    
+    printf("\nCarta 2 - %s (%s):\n", cidade2.nome, cidade2.estado);
+    printf("%s: %.2f\n", obterNomeAtributo(atributo1), valor2_atr1);
+    printf("%s: %.2f\n", obterNomeAtributo(atributo2), valor2_atr2);
+    printf("Soma: %.2f\n", soma2);
+    
+    // Determina o vencedor
+    printf("\nResultado: ");
+    if (soma1 > soma2) {
+        printf("Carta 1 (%s) venceu!\n", cidade1.nome);
+    } else if (soma2 > soma1) {
+        printf("Carta 2 (%s) venceu!\n", cidade2.nome);
+    } else {
+        printf("Empate!\n");
     }
 }
 
 int main() {
     setlocale(LC_ALL, "Portuguese");
     Cidade cidade1, cidade2;
-    int opcao;
+    int atributo1, atributo2;
     
     printf("=== Super Trunfo - Cidades ===\n");
     
@@ -207,19 +203,15 @@ int main() {
     printf("\nCidade 2:");
     exibirCidade(cidade2);
     
-    // Loop do menu de comparacao
-    do {
-        opcao = exibirMenu();
-        
-        if (opcao >= OPCAO_POPULACAO && opcao <= OPCAO_DENSIDADE) {
-            compararCidades(cidade1, cidade2, opcao);
-        } else if (opcao != OPCAO_SAIR) {
-            printf("\nOpcao invalida! Tente novamente.\n");
-        }
-        
-    } while (opcao != OPCAO_SAIR);
+    // Escolha dos dois atributos
+    printf("\nEscolha o primeiro atributo para comparacao:");
+    atributo1 = exibirMenu(0);
     
-    printf("\nObrigado por jogar!\n");
+    printf("\nEscolha o segundo atributo para comparacao:");
+    atributo2 = exibirMenu(atributo1);
+    
+    // Realiza a comparacao com os dois atributos
+    compararCidades(cidade1, cidade2, atributo1, atributo2);
     
     return 0;
 }
